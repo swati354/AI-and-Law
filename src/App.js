@@ -31,6 +31,8 @@ const App = () => {
     try{
         const response = await fetch('http://localhost:8000/completions', options);
         const data = await response.json();
+        // const ans = data.choices[0].message;
+        // const changedRes =  ans.split('*').join("\r\n");
         setMessage(data.choices[0].message);
     }catch(error){
       console.error(error);
@@ -83,7 +85,7 @@ const App = () => {
 
       <section className="main">
         {/* it will be displayed only when there is no currentTitle  */}
-        {!currentTitle && <h1>MyGPT</h1>}
+        {!currentTitle && <h1>LegalMind</h1>}
         <ul className="feed">
           {currentChat?.map((chatMessage, index) => <li key = {index}>
             <p className="role">{chatMessage.role}</p>
