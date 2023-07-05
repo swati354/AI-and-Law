@@ -14,6 +14,38 @@ body{
   display: flex;
 }
 
+.centerBox{
+  background: #0F2027;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  height : 100vh;
+  width : 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.heading {
+  font-size: 100px;
+}
+
+.clickButton{
+  cursor: pointer;
+}
+
+.mainDiv{
+  background-color: #292e49;
+  height : 100vh;
+  width : 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
 .side-bar{
   background-color: #202123;
   height: 100vh;
@@ -102,6 +134,14 @@ input:focus{
 #submit{
   position: absolute;
   bottom: 7px;
+  right: -14px;
+  cursor: pointer;
+  font-size: 25px;
+}
+
+#submitDoc{
+  position: absolute;
+  top : 6px;
   right: -14px;
   cursor: pointer;
   font-size: 25px;

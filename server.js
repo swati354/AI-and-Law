@@ -46,4 +46,30 @@ app.post('/completions', async (req,res) => {
     }
 })
 
+app.post('/getDocuments', async (req,res) => {
+    const prompt = `Summarize the documents required to obtain the below certificate in India in bullet points.
+    Document:`;
+    const question = prompt + req.body.message;
+    const options = {
+        method : "POST",
+        headers: {
+            "Authorization" : `Bearer ${API_KEY}`,
+            "Content-Type" : "application/json"
+        },
+        body : JSON.stringify({
+            model : "gpt-3.5-turbo",
+            messages: [{role : "user", content: question}],
+            max_tokens : 300
+        }) 
+    }
+    try{
+        const response = await fetch('https://api.openai.com/v1/chat/completions', options);
+        // const changedRes =  response.split('*').join("\r\n");
+        const data = await response.json()
+        res.send(data);
+    }catch(error){
+        console.error(error);
+    }
+})
+
 app.listen(PORT, () => console.log('Your server is running on PORT ' + PORT));
