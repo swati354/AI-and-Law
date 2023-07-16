@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import parse from 'html-react-parser';
 
 const Chat = () => {
   const [value, setValue] = useState(null);
@@ -31,9 +32,16 @@ const Chat = () => {
     try{
         const response = await fetch('http://localhost:8000/completions', options);
         const data = await response.json();
-        // const ans = data.choices[0].message;
-        // const changedRes =  ans.split('*').join("\r\n");
-        setMessage(data.choices[0].message);
+        const ans = data.choices[0].message.content;
+        const role = data.choices[0].message.role;
+        console.log(ans);
+        
+        var showdown  = require('showdown'),
+        converter = new showdown.Converter(),
+        html      = converter.makeHtml(ans);
+        // console.log(html);
+        
+        setMessage({role : role, content : html});
     }catch(error){
       console.error(error);
     }
@@ -64,11 +72,11 @@ const Chat = () => {
     }
   }, [message, currentTitle])
 
-  console.log(previousChats);
+  // console.log(previousChats);
 
   const currentChat = previousChats.filter(previousChat => previousChat.title === currentTitle);
   const uniqueTitles = Array.from(new Set(previousChats.map(previousChat => previousChat.title)));
-  console.log(uniqueTitles);
+  // console.log(uniqueTitles);
 
   return (
     <div className="app">
@@ -89,7 +97,7 @@ const Chat = () => {
         <ul className="feed">
           {currentChat?.map((chatMessage, index) => <li key = {index}>
             <p className="role">{chatMessage.role}</p>
-            <p>{chatMessage.content}</p>
+            <p>{parse(chatMessage.content)}</p>
           </li>)}
         </ul>
         <div className="bottom-container">
@@ -102,7 +110,7 @@ const Chat = () => {
           <p className="info">
           Free Research Preview. ChatGPT may produce inaccurate information about people, places, or facts. ChatGPT May 24 Version
           </p>
-        </div>
+        </div> 
       </section>
     </div>
   )

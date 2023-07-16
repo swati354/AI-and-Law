@@ -15,8 +15,8 @@ app.post('/completions', async (req,res) => {
     const prompt = `I want you to take the role of a very famous Indian lawyer. You specialize mainly in laws related to women. 
     You've been assisting women who come to you for help for over 10 years now. 
     A women has come to you asking for help. Below is her question. Assist her by providing the following details 
-    and be as precise and informative as possible.Keep the answer well formatted so that it is easy to read and do 
-    not mention that you are a lawyer in the answer. 
+    and be as precise and informative as possible.Format the answer by starting each point with '##' and the subpoints with digits so that it is easy to read.
+    Remember not to mention that you are a lawyer in the answer. 
     1. The rights violated and laws applicable
     2. Where to file the complaint
     3. Documents required
@@ -39,12 +39,14 @@ app.post('/completions', async (req,res) => {
     try{
         const response = await fetch('https://api.openai.com/v1/chat/completions', options);
         // const changedRes =  response.split('*').join("\r\n");
-        const data = await response.json()
+        const data = await response.json();
         res.send(data);
     }catch(error){
         console.error(error);
     }
 })
+
+
 
 app.post('/getDocuments', async (req,res) => {
     const prompt = `Summarize the documents required to obtain the below certificate in India in bullet points.
