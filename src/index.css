@@ -176,3 +176,25 @@ input:focus{
   /* padding-left: 20px; */
 }
 
+#loading{
+  position: absolute;
+  left: 60%;
+  top: 50%;
+  z-index: 1;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border: 13px solid rgb(161, 164, 164);
+  border-radius: 50%;
+  border-top: 13px solid #242d34;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+  visibility: hidden;
+  }
+    
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); } 
+   }
+
