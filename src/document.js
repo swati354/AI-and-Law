@@ -1,40 +1,147 @@
-import { useState} from "react";
+import { useState, useEffect } from "react";
+import parse from 'html-react-parser';
 
-const Document = () =>{
-    const [value, setValue] = useState(null);
-    const [message, setMessage] = useState(null);
+const Document = () => {
+  const [value, setValue] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [previousChats, setPreviousChats] = useState([]);
+  const [currentTitle, setCurrentTitle] = useState(null);
 
-    const getMessages = async () => {
-        const options = {
-          method : "POST",
-          headers : {
-            "Content-Type" : "application/json"
-          },
-          body : JSON.stringify({
-            message : value
-          })
-        }
-        try{
-            const response = await fetch('http://localhost:8000/getDocuments', options);
-            const data = await response.json();
-            // console.log(data);
-            console.log(data.choices[0].message);
-            setMessage(data.choices[0].message);
-        }catch(error){
-          console.error(error);
-        }
+  const createNewChat = () => {
+    setMessage(null);
+    setValue("");
+    setCurrentTitle(null);
+  }
+
+  const handleClick = (uniqueTitle) => {
+    setCurrentTitle(uniqueTitle);
+    setMessage(null);
+    setValue("");
+  }
+
+
+
+  const getMessages = async () => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: value
+      })
+    } 
+    try {
+      showloader();
+
+      const response = await fetch('http://localhost:8000/getDocuments', options);
+      const data = await response.json();
+      const ans = data.choices[0].message.content;
+      const role = data.choices[0].message.role;
+      console.log(ans);
+      
+      var showdown = require('showdown'),
+      converter = new showdown.Converter(),
+      html = converter.makeHtml(ans);
+      console.log("received");
+      
+      if (html) {
+        hideloader();
       }
-    //   console.log(message);
-    return (
-        <div className="mainDiv">
-            <h1>Documents</h1>
-            <div className="input-container">
-            <input value = {value} onChange={(e) => setValue(e.target.value)}/>
-            <div id = "submitDoc" onClick={getMessages}>&#10146;</div>
-            {message && <p>{message.content}</p>}
-          </div>
-        </div> 
-    ) 
-}
+
+      setMessage({ role: role, content: html });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+
+  // console.log(message);
+  //whenever message changes this will run
+  useEffect(() => {
+    // console.log(currentTitle, value, message);
+    if (!currentTitle && value && message) {
+      setCurrentTitle(value);
+    }
+    if (currentTitle && value && message) {
+      setPreviousChats(previousChats => (
+        //open previousChats and add two objects
+        [...previousChats, {
+          title: currentTitle,
+          role: "user",
+          content: value
+        }, {
+          title: currentTitle,
+          role: message.role,
+          content: message.content
+        }]
+      ))
+    }
+  }, [message, currentTitle])
+
+  // console.log(previousChats);
+
+  const currentChat = previousChats.filter(previousChat => previousChat.title === currentTitle);
+  const uniqueTitles = Array.from(new Set(previousChats.map(previousChat => previousChat.title)));
+  // console.log(uniqueTitles);
+
+  function hideloader() {
   
+    // Setting display of spinner
+    // element to none
+    document.getElementById('loading')
+                .style.visibility = 'hidden';
+}
+
+function showloader() {
+  document.getElementById('loading').style.visibility = 'visible';
+}
+
+  return (
+    <div className="app">
+
+      <section className="side-bar">
+        <button onClick={createNewChat}>+ New chat</button>
+        <ul className="history">
+          {uniqueTitles?.map((uniqueTitle, index) => <li key={index} onClick={() => handleClick(uniqueTitle)}>{uniqueTitle}</li>)}
+        </ul>
+        <nav>
+          <p>Happy searching</p>
+        </nav>
+      </section>
+
+      <section className="main">
+        {/* it will be displayed only when there is no currentTitle  */}
+        {!currentTitle && <h1>LegalMind</h1>}
+        <ul className="feed">
+          {currentChat?.map((chatMessage, index) => <li key={index}>
+            <p className="role">{chatMessage.role}</p>
+            <p>{parse(chatMessage.content)}</p>
+          </li>)}
+        </ul>
+
+        <div class="d-flex justify-content-center">
+          <div class="spinner-border" role="status">
+            <span class="sr-only" id="loading"></span>
+          </div>
+        </div>
+        
+
+        <div className="bottom-container">
+          <div className="input-container">
+            {/* initially value of the input would be value which initially is null  */}
+            {/* e is the event  */}
+            <input value={value} onChange={(e) => setValue(e.target.value)} />
+            <div id="submit" onClick={getMessages}>&#10146;</div>
+          </div>
+          <p className="info">
+            Free Research Preview. ChatGPT may produce inaccurate information about people, places, or facts. ChatGPT May 24 Version
+          </p>
+        </div>
+      </section>
+    </div>
+  )
+}
+
 export default Document;
